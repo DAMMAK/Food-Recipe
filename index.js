@@ -6,10 +6,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 mongoose
-  .connect("mongodb://localhost/Task")
+  .connect("mongodb://localhost/Food")
   .then(() => console.log("Successfully connected"))
   .catch(err => console.log(`Error while connecting`));
-
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
@@ -22,7 +21,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/", async (req, res, next) => {});
+app.get("/", async (req, res, next) => {
+  res.send("Hello there!, welcome to food API");
+});
 
 app.get("/recipe", async (req, res, next) => {
   const recipes = await Recipe.find({});
@@ -62,7 +63,7 @@ app.post("/recipe", async (req, res, next) => {
   res.send(recipe).status(200);
 });
 
-app.put("/recipe", async(req, res, next) => {
+app.put("/recipe", async (req, res, next) => {
   const id = req.params.id;
   const {
     Name,
@@ -76,26 +77,25 @@ app.put("/recipe", async(req, res, next) => {
     Source
   } = req.body;
 
-    let recipe = await Recipe.findByIdAndUpdate(id, {
-        Name,
-        Category,
-        Instruction,
-        ThumbImg,
-        Tags,
-        Video,
-        Ingredients,
-        Measurements,
-        Source
-    });
-    res.send(recipe).status(200);
+  let recipe = await Recipe.findByIdAndUpdate(id, {
+    Name,
+    Category,
+    Instruction,
+    ThumbImg,
+    Tags,
+    Video,
+    Ingredients,
+    Measurements,
+    Source
+  });
+  res.send(recipe).status(200);
 });
 
-app.delete('/recipe', async(req, res, next)=>
-{
-    const id = req.params.id;
-    let recipe = await Recipe.findByIdAndDelete(id);
+app.delete("/recipe", async (req, res, next) => {
+  const id = req.params.id;
+  let recipe = await Recipe.findByIdAndDelete(id);
 
-    res.send(recipe).status(400);
+  res.send(recipe).status(400);
 });
 
-app.listen(PORT,()=>console.log(`Server Connected and listen to PORT ${PORT}`));
+app.listen(PORT, () => console.log(`Connecting to Server on ${PORT}`));
