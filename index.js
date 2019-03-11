@@ -10,7 +10,7 @@ mongoose
     "mongodb+srv://DAMMAK:Adedamola92@cluster0-m0sql.mongodb.net/test?retryWrites=true"
   )
   .then(() => console.log("Successfully connected"))
-  .catch(err => console.log(`Error while connecting`));
+  .catch(err => console.log(`Error Failed to connect to MOngoDB => ${err}`));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
