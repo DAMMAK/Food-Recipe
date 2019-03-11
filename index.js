@@ -6,7 +6,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 mongoose
-  .connect("mongodb://localhost/Food")
+  .connect(
+    "mongodb+srv://DAMMAK:Adedamola92@cluster0-m0sql.mongodb.net/test?retryWrites=true"
+  )
   .then(() => console.log("Successfully connected"))
   .catch(err => console.log(`Error while connecting`));
 app.use(bodyParser.json());

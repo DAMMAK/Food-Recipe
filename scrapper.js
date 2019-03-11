@@ -4,7 +4,7 @@ const Recipe = require("./model/recipeModel");
 const url = "https://www.themealdb.com/api/json/v1/1/latest.php";
 
 mongoose
-  .connect("mongodb://localhost/Food")
+    .connect("mongodb+srv://DAMMAK:Adedamola92@cluster0-m0sql.mongodb.net/test?retryWrites=true")
   .then(() => console.log("Successfully connected"))
   .catch(err => console.log(`Error while connecting`));
 
