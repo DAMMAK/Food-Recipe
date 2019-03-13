@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const express = require("express");
-const Recipe = require("./model/recipeModel");
+const { Recipe, User, SavedRecipe } = require("./model/recipeModel");
+const ObjectID = require("bson-objectid");
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -32,12 +34,37 @@ app.get("/recipe", async (req, res, next) => {
   res.send(recipes).status(200);
 });
 
-app.get("/recipe/:id", async (req, res, next) => {
-  const recipe = await Recipe.findById(req.params.id);
+app.get("/users", async (req, res, next) => {
+  const users = await User.find({});
+  res.send(users).status(200);
+});
+
+app.get("/recipe/:UserId", async (req, res, next) => {
+  const { UserId } = req.params;
+  if (!ObjectID.isValid(UserId))
+    return res.send({ error: "Invalid User Id, Pleas provide a valid user" });
+  let users = await User.findById(UserId);
+  if (!users) return res.send({ err: "Invalid User" }).status(400);
+  const recipes = await SavedRecipe.find({ UserId });
+  res.send(recipes).status(200);
+});
+
+app.get("/recipe/:UserId/:id", async (req, res, next) => {
+  const { UserId, Id } = req.params;
+  if (!ObjectID.isValid(UserId))
+    return res.send({ error: "Invalid User Id, Please provide a valid user" });
+  let users = await User.findById(UserId);
+  if (!users) return res.send({ err: "Invalid User" }).status(400);
+  const recipe = await SavedRecipe.find({ UserId, _id: Id });
   res.send(recipe).status(200);
 });
 
-app.post("/recipe", async (req, res, next) => {
+app.post("/recipe/:UserId", async (req, res, next) => {
+  let UserId = req.params.UserId;
+  if (!ObjectID.isValid(UserId))
+    return res.send({ error: "Invalid User Id, Pleas provide a valid user" });
+  let users = await User.findById(UserId);
+  if (!users) return res.send({ err: "Invalid User" }).status(400);
   const {
     Name,
     Category,
@@ -50,7 +77,7 @@ app.post("/recipe", async (req, res, next) => {
     Source
   } = req.body;
 
-  let recipe = new Recipe({
+  let recipe = new SavedRecipe({
     Name,
     Category,
     Instruction,
@@ -59,14 +86,20 @@ app.post("/recipe", async (req, res, next) => {
     Video,
     Ingredients,
     Measurements,
-    Source
+    Source,
+    UserId
   });
-  recipe = await recipe.save();
+  recipe = await SavedRecipe.save();
   res.send(recipe).status(200);
 });
 
-app.put("/recipe", async (req, res, next) => {
-  const id = req.params.id;
+app.put("/recipe/:UserId/:Id", async (req, res, next) => {
+  const { UserId, Id } = req.params;
+  if (!ObjectID.isValid(UserId))
+    return res.send({ error: "Invalid User Id, Pleas provide a valid user" });
+  let users = await User.findById(UserId);
+  if (!users) return res.send({ err: "Invalid User" }).status(400);
+
   const {
     Name,
     Category,
@@ -79,7 +112,7 @@ app.put("/recipe", async (req, res, next) => {
     Source
   } = req.body;
 
-  let recipe = await Recipe.findByIdAndUpdate(id, {
+  let recipe = await SavedRecipe.findByIdAndUpdate(Id, {
     Name,
     Category,
     Instruction,
@@ -90,13 +123,19 @@ app.put("/recipe", async (req, res, next) => {
     Measurements,
     Source
   });
+  if (!recipe) return res.send({ err: `Fail to Update your Recipe ` });
   res.send(recipe).status(200);
 });
 
 app.delete("/recipe", async (req, res, next) => {
-  const id = req.params.id;
-  let recipe = await Recipe.findByIdAndDelete(id);
-
+  const { UserId, Id } = req.params;
+  if (!ObjectID.isValid(UserId))
+    return res.send({ error: "Invalid User Id, Please provide a valid user" });
+  let users = await User.findById(UserId);
+  if (!users) return res.send({ err: "Invalid User" }).status(400);
+  let recipe = await SavedRecipe.findByIdAndDelete(Id);
+  if (!recipe)
+    return res.send({ err: `Fail to Delete your Recipe, Recipe not found` });
   res.send(recipe).status(400);
 });
 
