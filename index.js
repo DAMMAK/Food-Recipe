@@ -8,11 +8,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 mongoose
-  .connect(
-    "mongodb+srv://DAMMAK:Adedamola92@cluster0-m0sql.mongodb.net/test?retryWrites=true"
-  )
-  .then(() => console.log("Successfully connected"))
-  .catch(err => console.log(`Error Failed to connect to MOngoDB => ${err}`));
+  .connect("mongodb://localhost:27017/Food")
+  .then(() => console.log("Successfully connected to MongoDB"))
+  .catch(err => console.log(`Error while connecting to MongoDB`));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
@@ -89,7 +87,7 @@ app.post("/recipe/:UserId", async (req, res, next) => {
     Source,
     UserId
   });
-  recipe = await SavedRecipe.save();
+  recipe = await recipe.save();
   res.send(recipe).status(200);
 });
 
@@ -127,11 +125,16 @@ app.put("/recipe/:UserId/:Id", async (req, res, next) => {
   res.send(recipe).status(200);
 });
 
-app.delete("/recipe", async (req, res, next) => {
+app.delete("/recipe/:UserId/:Id", async (req, res, next) => {
   const { UserId, Id } = req.params;
   if (!ObjectID.isValid(UserId))
     return res.send({ error: "Invalid User Id, Please provide a valid user" });
   let users = await User.findById(UserId);
+  if (!ObjectID.isValid(Id))
+    return res.send({
+      error: "Invalid Recipe Id, Please provide a valid Recipe ID"
+    });
+
   if (!users) return res.send({ err: "Invalid User" }).status(400);
   let recipe = await SavedRecipe.findByIdAndDelete(Id);
   if (!recipe)

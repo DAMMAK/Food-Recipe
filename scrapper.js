@@ -4,9 +4,11 @@ const Recipe = require("./model/recipeModel");
 const url = "https://www.themealdb.com/api/json/v1/1/latest.php";
 
 mongoose
-    .connect("mongodb+srv://DAMMAK:Adedamola92@cluster0-m0sql.mongodb.net/test?retryWrites=true")
-  .then(() => console.log("Successfully connected"))
-  .catch(err => console.log(`Error while connecting`));
+  .connect(
+    "mongodb+srv://DAMMAK:Adedamola92@cluster0-m0sql.mongodb.net/test?retryWrites=true"
+  )
+  .then(() => console.log("Successfully connected to MongoDB"))
+  .catch(err => console.log(`Error while connecting to MongoDB`));
 
 const loadData = async () => {
   debugger;
